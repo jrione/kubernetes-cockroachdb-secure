@@ -1,7 +1,7 @@
 kong/
 CKA-COURSE/
 kubectl/*
-cockroach-windows-client/cockroach.exe
+certs/cockroach.exe
 alpine-pod.yaml
 jumpot.yaml
 storageclass.yaml
