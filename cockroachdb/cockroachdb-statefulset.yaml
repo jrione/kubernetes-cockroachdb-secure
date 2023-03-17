@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cockroachdb
+  namespace: default
+spec:
+  serviceName: "cockroachdb"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cockroachdb
+  template:
+    metadata:
+      labels:
+        app: cockroachdb
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                       - cockroachdb
+                topologyKey: kubernetes.io/hostname
+      containers:
+      - name: cockroachdb
+        image: cockroachdb/cockroach:v22.2.2
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "1"
+            memory: "1Gi"
+          limits:
+            cpu: "1.5"
+            memory: "1.5Gi"
+        ports:
+          - containerPort: 26257
+            name: grpc
+          - containerPort: 8080
+            name: http
+        env:
+          - name: COCKROACH_CHANNEL
+            value: kubernetes-insecure
+        command:
+        - "/bin/bash"
+        - "-ecx"
+        - "exec /cockroach/cockroach start --certs-dir /cockroach/cockroach-certs --logtostderr --advertise-host $(hostname).cockroachdb --http-addr 0.0.0.0 --join cockroachdb-0.cockroachdb,cockroachdb-1.cockroachdb,cockroachdb-2.cockroachdb --cache 25% --max-sql-memory 25%"
+        volumeMounts:
+        - name: datadirr
+          mountPath: /cockroach/cockroach-data
+        - name: certs
+          mountPath: /cockroach/cockroach-certs
+      volumes:
+        - name: datadirr
+          persistentVolumeClaim:
+            claimName: datadirr
+        - name: certs
+          secret:
+            secretName: cockroachdb.node
+            defaultMode: 256
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - metadata:
+        name: datadirr
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        storageClassName: nfs-client
+        resources:
+          requests:
+            storage: 2Gi
+

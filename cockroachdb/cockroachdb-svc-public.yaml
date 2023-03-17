@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cockroachdb-public
+  labels:
+    app: cockroachdb
+spec:
+  selector:
+    app: cockroachdb
+  type: NodePort
+  ports:
+    - port: 26257
+      targetPort: 26257
+      nodePort: 32000
+      name: grpc
+    - port: 8080
+      targetPort: 8080
+      nodePort: 32001
+      name: http
+    

@@ -1,0 +1,8 @@
+kong/
+CKA-COURSE/
+kubectl/*
+cockroach-windows-client/cockroach.exe
+alpine-pod.yaml
+jumpot.yaml
+storageclass.yaml
+admin_openrc
