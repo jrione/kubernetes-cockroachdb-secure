@@ -3,7 +3,6 @@ STEP TO INSTALL COCKROACHDB SECURE CLUSTER:
 2. membuat cockroachdb certs menggunakan command:
 	> cockroach cert create-ca --certs-dir=certs --ca-key=ca-key/ca.key (untuk cluster)
 	> cockroach cert create-client root --certs-dir=certs --ca-key=ca-key/ca.key (untuk root user)
-	Atau bisa langsung mounting certs di folder yang ada di certs/
 3. Membuat secret:
 	> kubectl create secret generic cockroachdb.client.root --from-file=certs
 	> kubectl create secret generic cockroachdb.node --from-file=certs
