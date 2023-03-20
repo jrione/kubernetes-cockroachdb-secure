@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cluster-init
+  #namespace: cockroachdb
   labels:
     app: cockroachdb
 spec:
@@ -15,8 +16,8 @@ spec:
         command:
           - "/bin/bash"
           - "-ecx"
-          #- "/cockroach/cockroach init --insecure --host=cockroachdb-1.cockroachdb"
-          - "/cockroach/cockroach init --certs-dir=/cockroach/cockroach-certs --host cockroachdb-1.cockroachdb"
+          #- "/cockroach/cockroach init --insecure --host=cockroachdb-1.cockroachdb "
+          - "/cockroach/cockroach init --host cockroachdb-1.cockroachdb --certs-dir=/cockroach/cockroach-certs"
         volumeMounts:
           - name: certs
             mountPath: /cockroach/cockroach-certs
@@ -24,5 +25,5 @@ spec:
         - name: certs
           secret:
             secretName: cockroachdb.node
-            defaultMode: 256
+            defaultMode: 0777
       restartPolicy: OnFailure

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: cockroachdb
-  namespace: default
+  #namespace: cockroachdb
 spec:
   serviceName: "cockroachdb"
   replicas: 3
@@ -48,7 +48,7 @@ spec:
         command:
         - "/bin/bash"
         - "-ecx"
-        - "exec /cockroach/cockroach start --certs-dir /cockroach/cockroach-certs --logtostderr --advertise-host $(hostname).cockroachdb --http-addr 0.0.0.0 --join cockroachdb-0.cockroachdb,cockroachdb-1.cockroachdb,cockroachdb-2.cockroachdb --cache 25% --max-sql-memory 25%"
+        - "exec /cockroach/cockroach start --certs-dir=/cockroach/cockroach-certs --logtostderr --advertise-host $(hostname).cockroachdb --http-addr 0.0.0.0 --join cockroachdb-0.cockroachdb,cockroachdb-1.cockroachdb,cockroachdb-2.cockroachdb --cache 25% --max-sql-memory 25%"
         volumeMounts:
         - name: datadirr
           mountPath: /cockroach/cockroach-data
