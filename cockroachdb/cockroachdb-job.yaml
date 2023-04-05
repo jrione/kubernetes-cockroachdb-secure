@@ -2,22 +2,33 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cluster-init
-  #namespace: cockroachdb
   labels:
     app: cockroachdb
 spec:
   template:
     spec:
       containers:
+      - name: create-user
+        image: cockroachdb/cockroach:v22.2.2
+        imagePullPolicy: IfNotPresent
+        command:
+          - "/bin/bash"
+          - "-ecx"
+          - "/cockroach/cockroach sql --host cockroachdb-1.cockroachdb --certs-dir=/cockroach/cockroach-certs --execute=\"ALTER USER root WITH PASSWORD 'thispassword';  \" "
+          # - "/cockroach/cockroach sql --host cockroachdb-1.cockroachdb --certs-dir=/cockroach/cockroach-certs --execute=\"CREATE USER cucunguk WITH PASSWORD 'thispassword'; ALTER ROLE cucunguk WITH VIEWACTIVITY; GRANT ALL PRIVILEGES ON *.* TO cucunguk \" "
+        volumeMounts:
+          - name: certs
+            mountPath: /cockroach/cockroach-certs
+      #------
+      initContainers:
       - name: cluster-init
         image: cockroachdb/cockroach:v22.2.2
         imagePullPolicy: IfNotPresent
-        
         command:
           - "/bin/bash"
           - "-ecx"
           #- "/cockroach/cockroach init --insecure --host=cockroachdb-1.cockroachdb "
-          - "/cockroach/cockroach init --host cockroachdb-1.cockroachdb --certs-dir=/cockroach/cockroach-certs"
+          - "/cockroach/cockroach init --host cockroachdb-1.cockroachdb --certs-dir=/cockroach/cockroach-certs;"
         volumeMounts:
           - name: certs
             mountPath: /cockroach/cockroach-certs
@@ -25,5 +36,5 @@ spec:
         - name: certs
           secret:
             secretName: cockroachdb.node
-            defaultMode: 0777
+            defaultMode: 256
       restartPolicy: OnFailure

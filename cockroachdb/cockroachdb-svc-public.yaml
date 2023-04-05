@@ -18,4 +18,3 @@ spec:
       targetPort: 8080
       nodePort: 32001
       name: http
-    
